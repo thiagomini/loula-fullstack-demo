@@ -1,9 +1,11 @@
-import { Kysely } from 'kysely';
+import { Kysely, sql } from 'kysely';
 
 export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .createTable('employee_wages')
-    .addColumn('id', 'uuid', (col) => col.primaryKey())
+    .addColumn('id', 'uuid', (col) =>
+      col.primaryKey().defaultTo(sql`gen_random_uuid()`),
+    )
     .addColumn('employee_id', 'uuid', (col) => col.notNull())
     .addColumn('total_earned_wages', 'float8', (col) => col.notNull())
     .addColumn('currency', 'varchar', (col) => col.notNull())
