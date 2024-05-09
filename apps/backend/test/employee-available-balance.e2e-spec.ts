@@ -3,6 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { configureApplication } from '../src/app.config';
 import { AppModule } from '../src/app.module';
 import { DSL, createDSL } from './dsl/dsl.factory';
+import { randomUUID } from 'crypto';
 
 describe('Employee Available Balance (e2e)', () => {
   let app: INestApplication;
@@ -36,7 +37,28 @@ describe('Employee Available Balance (e2e)', () => {
       ${0}   | ${'ARS'} | ${'USD'}          | ${0}
     `(
       'Returns $balance when user has $amount $currency and requests $currencyRequested',
-      async ({ amount, currency, currencyRequested, balance }) => {},
+      async ({ amount, currency, currencyRequested, balance }) => {
+        // Arrange
+        const employeeId = randomUUID();
+        await dsl.employee.createEmployee({ id: employeeId });
+        await dsl.wage.createEmployeeWage({
+          employeeId,
+          amount,
+          currency,
+        });
+
+        // Act
+        await dsl.wage
+          .availableBalance(
+            { currency: currencyRequested },
+            { userId: employeeId },
+          )
+          // Assert
+          .expect(200, {
+            amount: balance,
+            currency: currencyRequested,
+          });
+      },
     );
 
     test.each`

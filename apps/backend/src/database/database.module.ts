@@ -6,6 +6,7 @@ import { DATABASE } from './constants';
 
 @Module({
   providers: [databaseProvider],
+  exports: [DATABASE],
 })
 export class DatabaseModule implements OnModuleDestroy {
   constructor(
