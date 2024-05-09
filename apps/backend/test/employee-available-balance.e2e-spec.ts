@@ -1,9 +1,12 @@
 import { INestApplication } from '@nestjs/common';
-import { TestingModule, Test } from '@nestjs/testing';
+import { Test, TestingModule } from '@nestjs/testing';
+import { configureApplication } from '../src/app.config';
 import { AppModule } from '../src/app.module';
+import { DSL, createDSL } from './dsl/dsl.factory';
 
 describe('Employee Available Balance (e2e)', () => {
   let app: INestApplication;
+  let dsl: DSL;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -11,7 +14,9 @@ describe('Employee Available Balance (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    configureApplication(app);
     await app.init();
+    dsl = createDSL(app);
   });
 
   afterAll(async () => {
@@ -49,6 +54,10 @@ describe('Employee Available Balance (e2e)', () => {
   });
 
   describe('error cases', () => {
-    test.todo('Returns 401 when user is not authenticated');
+    test('Returns 403 when user is not authenticated', async () => {
+      await dsl.wage
+        .availableBalance({ currency: 'USD' }, { userId: undefined })
+        .expect(403);
+    });
   });
 });
