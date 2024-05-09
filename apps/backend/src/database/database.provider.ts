@@ -1,4 +1,4 @@
-import { FactoryProvider } from '@nestjs/common';
+import { FactoryProvider, Scope } from '@nestjs/common';
 import { DATABASE } from './constants';
 import { Kysely, PostgresDialect } from 'kysely';
 import { DB } from 'kysely-codegen';
@@ -10,9 +10,11 @@ export const databaseProvider: FactoryProvider = {
     return new Kysely<DB>({
       dialect: new PostgresDialect({
         pool: new Pool({
-          connectionString: process.env.DATABASE_URL,
+          connectionString:
+            'postgresql://postgres:password@localhost:5432/loula',
         }),
       }),
     });
   },
+  scope: Scope.DEFAULT,
 };
