@@ -1,3 +1,4 @@
+import * as ExactCurrency from 'currency.js';
 import { Currency } from './currency';
 import { Ratio } from './ratio';
 
@@ -17,6 +18,16 @@ export class Money {
         ? this.amount * ratio.value
         : this.amount / ratio.value;
     return new Money(newAmount, targetCurrency);
+  }
+
+  plus(other: Money): Money {
+    if (this.currency !== other.currency) {
+      throw new Error('Cannot sum different currencies');
+    }
+    return new Money(
+      new ExactCurrency(this.amount).add(other.amount).value,
+      this.currency,
+    );
   }
 
   static dollar(amount: number): Money {

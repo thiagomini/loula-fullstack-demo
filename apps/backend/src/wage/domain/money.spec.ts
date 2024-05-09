@@ -26,4 +26,24 @@ describe('Money', () => {
 
     expect(dollars).toEqual(Money.dollar(0.1));
   });
+  test('sums two amounts in the same currency', () => {
+    const fiveDollars = Money.dollar(5);
+    const tenDollars = Money.dollar(10);
+
+    expect(fiveDollars.plus(tenDollars)).toEqual(Money.dollar(15));
+  });
+  test('cannot sum two amounts in different currencies', () => {
+    const fiveDollars = Money.dollar(5);
+    const tenPesos = Money.peso(10);
+
+    expect(() => fiveDollars.plus(tenPesos)).toThrow(
+      'Cannot sum different currencies',
+    );
+  });
+  test('sum two floating point numbers', () => {
+    const fiveDollars = Money.dollar(0.1);
+    const tenDollars = Money.dollar(0.2);
+
+    expect(fiveDollars.plus(tenDollars)).toStrictEqual(Money.dollar(0.3));
+  });
 });
