@@ -30,6 +30,10 @@ export class Money {
     );
   }
 
+  isSameCurrencyOf(other: Money): boolean {
+    return this.currency === other.currency;
+  }
+
   static dollar(amount: number): Money {
     return new Money(amount, 'USD');
   }

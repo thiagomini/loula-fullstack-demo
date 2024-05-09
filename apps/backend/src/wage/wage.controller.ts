@@ -3,6 +3,9 @@ import { Kysely } from 'kysely';
 import { DB } from 'kysely-codegen';
 import { DATABASE } from '../database/constants';
 import { USER_HEADER } from '../iam/headers';
+import { Money } from './domain/money';
+import { Currency } from './domain/currency';
+import { Ratio } from './domain/ratio';
 
 @Controller('wage')
 export class WageController {
@@ -16,7 +19,6 @@ export class WageController {
     @Query('currency') requestedCurrency: string,
     @Headers(USER_HEADER) userId?: string,
   ) {
-    const usdToArsRatio = 100;
     const employeeId = userId;
 
     const employeeWages = await this.db
@@ -25,20 +27,25 @@ export class WageController {
       .where('employee_id', '=', employeeId)
       .execute();
 
-    const totalWagesInCurrency = employeeWages.reduce((total, current) => {
-      if (current.currency === requestedCurrency) {
-        return total + current.total_earned_wages;
-      } else {
-        if (requestedCurrency === 'USD' && current.currency === 'ARS') {
-          return total + current.total_earned_wages / usdToArsRatio;
+    const totalWagesInCurrency = employeeWages.reduce(
+      (total, current) => {
+        const currentMoney = new Money(
+          current.total_earned_wages,
+          current.currency as Currency,
+        );
+        if (currentMoney.isSameCurrencyOf(total)) {
+          return total.plus(currentMoney);
         } else {
-          return total + current.total_earned_wages * usdToArsRatio;
+          return total.plus(
+            currentMoney.to(total.currency, Ratio.dollarToPeso()),
+          );
         }
-      }
-    }, 0);
+      },
+      new Money(0, requestedCurrency as Currency),
+    );
 
     return {
-      amount: totalWagesInCurrency,
+      amount: totalWagesInCurrency.amount,
       currency: requestedCurrency,
     };
   }

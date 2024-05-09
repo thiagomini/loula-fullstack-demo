@@ -41,9 +41,13 @@ describe('Money', () => {
     );
   });
   test('sum two floating point numbers', () => {
-    const fiveDollars = Money.dollar(0.1);
-    const tenDollars = Money.dollar(0.2);
+    const tenCents = Money.dollar(0.1);
+    const twentyCents = Money.dollar(0.2);
 
-    expect(fiveDollars.plus(tenDollars)).toStrictEqual(Money.dollar(0.3));
+    expect(tenCents.plus(twentyCents)).toStrictEqual(Money.dollar(0.3));
+  });
+  test('is same currency', () => {
+    expect(Money.dollar(1).isSameCurrencyOf(Money.dollar(2))).toBe(true);
+    expect(Money.dollar(1).isSameCurrencyOf(Money.peso(1))).toBe(false);
   });
 });
