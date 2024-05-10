@@ -13,6 +13,9 @@ export class Money {
   }
 
   to(targetCurrency: Currency, ratio: Ratio): Money {
+    if (this.currency === targetCurrency) {
+      return new Money(this.amount, targetCurrency);
+    }
     const newAmount =
       this.currency === ratio.from
         ? this.amount * ratio.value
@@ -44,8 +47,20 @@ export class Money {
     return this.currency === other.currency;
   }
 
+  is(currency: Currency) {
+    return this.currency === currency;
+  }
+
   isGreaterThan(other: Money): boolean {
     return this.amount > other.amount;
+  }
+
+  canPay(other: Money): boolean {
+    return this.amount >= other.amount;
+  }
+
+  toString() {
+    return `${this.amount} ${this.currency}`;
   }
 
   static dollar(amount: number): Money {

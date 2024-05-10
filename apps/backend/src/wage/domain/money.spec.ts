@@ -42,6 +42,14 @@ describe('Money', () => {
 
     expect(dollars).toEqual(Money.dollar(0.1));
   });
+  test('transforms from USD to USD (no-op)', () => {
+    const tenDollars = new Money(10, 'USD');
+    const dollarToPesoRatio = Ratio.dollarToPeso();
+
+    const argentinianPesos = tenDollars.to('USD', dollarToPesoRatio);
+
+    expect(argentinianPesos).toEqual(Money.dollar(10));
+  });
   describe('sum', () => {
     test('sums two amounts in the same currency', () => {
       const fiveDollars = Money.dollar(5);
