@@ -1,13 +1,13 @@
 import { Body, Controller, Get, Headers, Post, Query } from '@nestjs/common';
-import { USER_HEADER } from '../iam/headers';
-import { ZodValidationPipe } from '../utils/zod-validation.pipe';
-import { WageService } from './application/wage.service';
+import { USER_HEADER } from '../../iam/headers';
+import { ZodValidationPipe } from '../../utils/zod-validation.pipe';
+import { WageService } from '../application/wage.service';
 import { currencySchema } from './currency.validation';
-import { Currency } from './domain/currency';
+import { Currency } from '../domain/currency';
 import {
   RequestWageAccessDTO,
   requestWageAccessSchema,
-} from './presentation/request-wage-access.dto';
+} from './request-wage-access.dto';
 
 @Controller('wages')
 export class WageController {

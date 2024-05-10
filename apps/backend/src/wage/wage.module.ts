@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { WageController } from './wage.controller';
+import { WageController } from './presentation/wage.controller';
 import { DatabaseModule } from '../database/database.module';
 import { WageService } from './application/wage.service';
 import { EmployeeWagesRepository } from './infra/employee-wages.repository';
