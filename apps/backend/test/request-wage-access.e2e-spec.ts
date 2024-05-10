@@ -31,6 +31,13 @@ describe('Request Wage Access (e2e)', () => {
       ${1}   | ${'USD'} | ${1}            | ${'USD'}          | ${true}
       ${1}   | ${'USD'} | ${100}          | ${'ARS'}          | ${true}
       ${1}   | ${'USD'} | ${101}          | ${'ARS'}          | ${false}
+      ${0}   | ${'USD'} | ${1}            | ${'USD'}          | ${false}
+      ${0}   | ${'USD'} | ${1}            | ${'ARS'}          | ${false}
+      ${100} | ${'ARS'} | ${100}          | ${'ARS'}          | ${true}
+      ${100} | ${'ARS'} | ${1}            | ${'USD'}          | ${true}
+      ${100} | ${'ARS'} | ${2}            | ${'USD'}          | ${false}
+      ${0}   | ${'ARS'} | ${1}            | ${'ARS'}          | ${false}
+      ${0}   | ${'ARS'} | ${1}            | ${'USD'}          | ${false}
     `(
       'requested is approved: $approved when user has $amount $currency and requests $amountRequested $currencyRequested',
       async ({
