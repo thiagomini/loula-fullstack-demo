@@ -64,7 +64,7 @@ describe('Employee Available Balance (e2e)', () => {
     test.each`
       amountUSD | amountARS | currencyRequested | balance
       ${1}      | ${100}    | ${'USD'}          | ${2}
-      ${1}      | ${1}      | ${'USD'}          | ${1.1}
+      ${1}      | ${1}      | ${'USD'}          | ${1.01}
       ${1}      | ${0}      | ${'USD'}          | ${1}
       ${0}      | ${0}      | ${'USD'}          | ${0}
       ${1}      | ${100}    | ${'ARS'}          | ${200}
@@ -72,7 +72,38 @@ describe('Employee Available Balance (e2e)', () => {
       ${1}      | ${0}      | ${'ARS'}          | ${100}
       ${0}      | ${1}      | ${'ARS'}          | ${1}
       ${0}      | ${0}      | ${'ARS'}          | ${0}
-    `;
+    `(
+      'Returns $balance when user has $amountUSD USD and $amountARS ARS and requests $currencyRequested',
+      async ({ amountUSD, amountARS, currencyRequested, balance }) => {
+        // Arrange
+        const employeeId = randomUUID();
+        await dsl.employee.createEmployee({ id: employeeId });
+        await dsl.wage.createEmployeeWages([
+          {
+            employeeId,
+            amount: amountUSD,
+            currency: 'USD',
+          },
+          {
+            employeeId,
+            amount: amountARS,
+            currency: 'ARS',
+          },
+        ]);
+
+        // Act
+        await dsl.wage
+          .availableBalance(
+            { currency: currencyRequested },
+            { userId: employeeId },
+          )
+          // Assert
+          .expect(200, {
+            amount: balance,
+            currency: currencyRequested,
+          });
+      },
+    );
   });
 
   describe('error cases', () => {

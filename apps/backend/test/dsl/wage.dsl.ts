@@ -4,6 +4,11 @@ import { DATABASE } from '../../src/database/constants';
 import { Database } from '../../src/database/database.type';
 
 export type AvailableBalanceParams = { currency: 'USD' | 'ARS' };
+export type CreateEmployeeWageCommand = {
+  employeeId: string;
+  amount: number;
+  currency: 'USD' | 'ARS';
+};
 export function wage(app: INestApplication) {
   return Object.freeze({
     availableBalance: (
@@ -18,11 +23,7 @@ export function wage(app: INestApplication) {
       }
       return req;
     },
-    createEmployeeWage(data: {
-      employeeId: string;
-      amount: number;
-      currency: 'USD' | 'ARS';
-    }) {
+    createEmployeeWage(data: CreateEmployeeWageCommand) {
       const db = app.get<Database>(DATABASE);
       return db
         .insertInto('employee_wages')
@@ -32,6 +33,19 @@ export function wage(app: INestApplication) {
           total_earned_wages: data.amount,
         })
         .executeTakeFirst();
+    },
+    createEmployeeWages(data: CreateEmployeeWageCommand[]) {
+      const db = app.get<Database>(DATABASE);
+      return db
+        .insertInto('employee_wages')
+        .values(
+          data.map((wage) => ({
+            employee_id: wage.employeeId,
+            currency: wage.currency,
+            total_earned_wages: wage.amount,
+          })),
+        )
+        .execute();
     },
   });
 }
