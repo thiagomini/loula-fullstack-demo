@@ -4,6 +4,7 @@ import { configureApplication } from '../src/app.config';
 import { AppModule } from '../src/app.module';
 import { DSL, createDSL } from './dsl/dsl.factory';
 import { randomUUID } from 'crypto';
+import { RequestWageAccessParams } from './dsl/wage.dsl';
 
 describe('Request Wage Access (e2e)', () => {
   let app: INestApplication;
@@ -32,14 +33,35 @@ describe('Request Wage Access (e2e)', () => {
   describe('error cases', () => {
     test('Returns 403 when user is not authenticated', async () => {
       await dsl.wage
-        .requestAccess({ currency: 'USD' }, { userId: undefined })
+        .requestAccess({ currency: 'USD' } as RequestWageAccessParams, {
+          userId: undefined,
+        })
         .expect(403);
     });
 
     test('Returns 400 when currency is not provided', async () => {
       const employeeId = randomUUID();
       await dsl.wage
-        .availableBalance({ currency: undefined }, { userId: employeeId })
+        .requestAccess({ currency: undefined } as RequestWageAccessParams, {
+          userId: employeeId,
+        })
+        .expect(400);
+    });
+
+    test('Returns 400 when amount is not provided', async () => {
+      const employeeId = randomUUID();
+      await dsl.wage
+        .requestAccess(
+          { currency: 'USD', amount: undefined },
+          { userId: employeeId },
+        )
+        .expect(400);
+    });
+
+    test('Returns 400 when amount is 0', async () => {
+      const employeeId = randomUUID();
+      await dsl.wage
+        .requestAccess({ currency: 'USD', amount: 0 }, { userId: employeeId })
         .expect(400);
     });
   });

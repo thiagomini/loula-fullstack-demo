@@ -4,6 +4,10 @@ import { DATABASE } from '../../src/database/constants';
 import { Database } from '../../src/database/database.type';
 
 export type AvailableBalanceParams = { currency: 'USD' | 'ARS' };
+export type RequestWageAccessParams = {
+  currency: 'USD' | 'ARS';
+  amount: number;
+};
 export type CreateEmployeeWageCommand = {
   employeeId: string;
   amount: number;
@@ -24,7 +28,7 @@ export function wage(app: INestApplication) {
       return req;
     },
     requestAccess: (
-      params: { currency: 'USD' | 'ARS' },
+      params: RequestWageAccessParams,
       options?: { userId?: string },
     ) => {
       const req = request(app.getHttpServer()).post(`/api/wages/requests`);

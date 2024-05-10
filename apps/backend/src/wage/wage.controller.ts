@@ -4,6 +4,10 @@ import { ZodValidationPipe } from '../utils/zod-validation.pipe';
 import { WageService } from './application/wage.service';
 import { currencySchema } from './currency.validation';
 import { Currency } from './domain/currency';
+import {
+  RequestWageAccessDTO,
+  requestWageAccessSchema,
+} from './presentation/request-wage-access.dto';
 
 @Controller('wages')
 export class WageController {
@@ -31,8 +35,8 @@ export class WageController {
 
   @Post('requests')
   public async requestWageAccess(
-    @Body()
-    _request: unknown,
+    @Body(new ZodValidationPipe(requestWageAccessSchema))
+    _body: RequestWageAccessDTO,
     @Headers(USER_HEADER) _userId?: string,
   ) {}
 }
