@@ -42,14 +42,14 @@ Feature: Request Wage Access
       | amountUSD | amountARS | amountRequested | currencyRequested | approved |
       | 1         | 1         | 1               | "USD"             | true     |
       | 1         | 1         | 1               | "ARS"             | true     |
-      | 1         | 1         | 2               | "USD"             | false    |
       | 1         | 1         | 2               | "ARS"             | true     |
+      | 0         | 1         | 1               | "ARS"             | true     |
+      | 0         | 100       | 1               | "USD"             | true     |
+      | 1         | 1         | 2               | "USD"             | false    |
       | 1         | 1         | 2               | "USD"             | false    |
       | 0         | 0         | 1               | "USD"             | false    |
       | 0         | 0         | 1               | "ARS"             | false    |
       | 0         | 1         | 1               | "USD"             | false    |
-      | 0         | 1         | 1               | "ARS"             | true     |
-      | 0         | 100       | 1               | "USD"             | true     |
 
       
      
