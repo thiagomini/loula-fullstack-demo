@@ -34,6 +34,10 @@ export class Money {
     return this.currency === other.currency;
   }
 
+  isGreaterThan(other: Money): boolean {
+    return this.amount > other.amount;
+  }
+
   static dollar(amount: number): Money {
     return new Money(amount, 'USD');
   }

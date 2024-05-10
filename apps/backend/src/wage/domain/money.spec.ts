@@ -10,6 +10,22 @@ describe('Money', () => {
   test('cannot be negative', () => {
     expect(() => new Money(-10, 'USD')).toThrow('Amount cannot be negative');
   });
+
+  describe('isGreater', () => {
+    test('true when amount is greater', () => {
+      const fiveDollars = new Money(5, 'USD');
+      const tenDollars = new Money(10, 'USD');
+
+      expect(tenDollars.isGreaterThan(fiveDollars)).toBe(true);
+    });
+    test('false when amount is lower', () => {
+      const fiveDollars = new Money(5, 'USD');
+      const tenDollars = new Money(10, 'USD');
+
+      expect(fiveDollars.isGreaterThan(tenDollars)).toBe(false);
+    });
+  });
+
   test('transforms from USD to ARS', () => {
     const tenDollars = new Money(10, 'USD');
     const dollarToPesoRatio = Ratio.dollarToPeso();

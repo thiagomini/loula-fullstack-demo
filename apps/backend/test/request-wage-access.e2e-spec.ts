@@ -26,7 +26,39 @@ describe('Request Wage Access (e2e)', () => {
   });
 
   describe('success cases', () => {
-    test.todo('user request wage access when it has one currency');
+    test.each`
+      amount | currency | amountRequested | currencyRequested | approved
+      ${1}   | ${'USD'} | ${1}            | ${'USD'}          | ${true}
+      ${1}   | ${'USD'} | ${100}          | ${'ARS'}          | ${true}
+      ${1}   | ${'USD'} | ${101}          | ${'ARS'}          | ${false}
+    `(
+      'requested is approved: $approved when user has $amount $currency and requests $amountRequested $currencyRequested',
+      async ({
+        amount,
+        currency,
+        amountRequested,
+        currencyRequested,
+        approved,
+      }) => {
+        // Arrange
+        const employeeId = randomUUID();
+        await dsl.employee.createEmployee({ id: employeeId });
+        await dsl.wage.createEmployeeWage({
+          employeeId,
+          amount,
+          currency,
+        });
+
+        // Act
+        await dsl.wage
+          .requestAccess(
+            { currency: currencyRequested, amount: amountRequested },
+            { userId: employeeId },
+          )
+          // Assert
+          .expect(approved ? 201 : 400);
+      },
+    );
     test.todo('user request wage access when it has both currencies');
   });
 

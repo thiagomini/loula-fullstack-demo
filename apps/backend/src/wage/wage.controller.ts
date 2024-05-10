@@ -17,10 +17,8 @@ export class WageController {
   public async availableBalance(
     @Query('currency', new ZodValidationPipe(currencySchema))
     requestedCurrency: string,
-    @Headers(USER_HEADER) userId?: string,
+    @Headers(USER_HEADER) employeeId: string,
   ) {
-    const employeeId = userId;
-
     const totalWagesInCurrency =
       await this.wageService.getEmployeeWagesInCurrency(
         employeeId,
@@ -36,7 +34,9 @@ export class WageController {
   @Post('requests')
   public async requestWageAccess(
     @Body(new ZodValidationPipe(requestWageAccessSchema))
-    _body: RequestWageAccessDTO,
-    @Headers(USER_HEADER) _userId?: string,
-  ) {}
+    body: RequestWageAccessDTO,
+    @Headers(USER_HEADER) employeeId: string,
+  ) {
+    await this.wageService.requestWageAccess(employeeId, body);
+  }
 }

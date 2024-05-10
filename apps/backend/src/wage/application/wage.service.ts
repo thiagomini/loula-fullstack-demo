@@ -1,9 +1,10 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { DATABASE } from '../../database/constants';
 import { Database } from '../../database/database.type';
 import { reduceWagesToCurrency } from '../domain/convert-currency';
 import { Currency } from '../domain/currency';
 import { Money } from '../domain/money';
+import { RequestWageAccessDTO } from '../presentation/request-wage-access.dto';
 
 @Injectable()
 export class WageService {
@@ -23,5 +24,20 @@ export class WageService {
       .execute();
 
     return reduceWagesToCurrency(employeeWages, requestedCurrency);
+  }
+
+  public async requestWageAccess(
+    employeeId: string,
+    { currency, amount }: RequestWageAccessDTO,
+  ) {
+    const employeeWages = await this.getEmployeeWagesInCurrency(
+      employeeId,
+      currency as Currency,
+    );
+
+    const requestedMoney = new Money(amount, currency as Currency);
+    if (requestedMoney.isGreaterThan(employeeWages)) {
+      throw new BadRequestException('Insufficient funds');
+    }
   }
 }
