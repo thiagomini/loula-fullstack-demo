@@ -50,6 +50,13 @@ Feature: Request Wage Access
       | 0         | 0         | 1               | "ARS"             | false    |
       | 0         | 1         | 1               | "USD"             | false    |
 
+  Scenario: User Request Wage Access twice
+    Given the employee has 90 in USD
+    When they request 50 in USD
+    Then it should approve: true
+
+    When they request 50 in USD
+    Then it should approve: false
       
      
 

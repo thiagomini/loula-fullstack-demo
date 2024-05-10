@@ -191,5 +191,41 @@ describe('Request Wage Access (e2e)', () => {
           .expect(400);
       },
     );
+
+    test('user requests wage access twice', async () => {
+      // Arrange
+      const employeeId = randomUUID();
+      await dsl.employee.createEmployee({ id: employeeId });
+      await dsl.wage.createEmployeeWage({
+        employeeId,
+        amount: 90,
+        currency: 'USD',
+      });
+      // First request
+      await dsl.wage
+        .requestAccess(
+          {
+            currency: 'USD',
+            amount: 50,
+          },
+          {
+            userId: employeeId,
+          },
+        )
+        .expect(201);
+      // Act
+      await dsl.wage
+        .requestAccess(
+          {
+            currency: 'USD',
+            amount: 50,
+          },
+          {
+            userId: employeeId,
+          },
+        )
+        // Assert
+        .expect(400);
+    });
   });
 });

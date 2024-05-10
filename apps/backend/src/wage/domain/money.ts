@@ -30,6 +30,16 @@ export class Money {
     );
   }
 
+  subtract(other: Money): Money {
+    if (this.currency !== other.currency) {
+      throw new Error('Cannot subtract different currencies');
+    }
+    return new Money(
+      new ExactCurrency(this.amount).subtract(other.amount).value,
+      this.currency,
+    );
+  }
+
   isSameCurrencyOf(other: Money): boolean {
     return this.currency === other.currency;
   }

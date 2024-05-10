@@ -39,5 +39,13 @@ export class WageService {
     if (requestedMoney.isGreaterThan(employeeWages)) {
       throw new BadRequestException('Insufficient funds');
     }
+    const newBalance = employeeWages.subtract(requestedMoney);
+
+    await this.db
+      .updateTable('employee_wages')
+      .set('total_earned_wages', newBalance.amount)
+      .where('employee_id', '=', employeeId)
+      .where('currency', '=', currency)
+      .execute();
   }
 }
