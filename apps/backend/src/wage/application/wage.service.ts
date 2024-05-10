@@ -1,29 +1,24 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
-import { DATABASE } from '../../database/constants';
-import { Database } from '../../database/database.type';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { reduceWagesToCurrency } from '../domain/convert-currency';
 import { Currency } from '../domain/currency';
 import { Money } from '../domain/money';
-import { RequestWageAccessDTO } from '../presentation/request-wage-access.dto';
 import { Ratio } from '../domain/ratio';
 import { Balance, withdraw } from '../domain/withdraw';
+import { EmployeeWagesRepository } from '../infra/employee-wages.repository';
+import { RequestWageAccessDTO } from '../presentation/request-wage-access.dto';
 
 @Injectable()
 export class WageService {
   constructor(
-    @Inject(DATABASE)
-    private readonly db: Database,
+    private readonly employeeWagesRepository: EmployeeWagesRepository,
   ) {}
 
   public async getEmployeeWagesInCurrency(
     employeeId: string,
     requestedCurrency: Currency,
   ): Promise<Money> {
-    const employeeWages = await this.db
-      .selectFrom('employee_wages')
-      .selectAll()
-      .where('employee_id', '=', employeeId)
-      .execute();
+    const employeeWages =
+      await this.employeeWagesRepository.findAllForEmployee(employeeId);
 
     return reduceWagesToCurrency(employeeWages, requestedCurrency);
   }
@@ -32,11 +27,8 @@ export class WageService {
     employeeId: string,
     { currency, amount }: RequestWageAccessDTO,
   ) {
-    const employeeWages = await this.db
-      .selectFrom('employee_wages')
-      .selectAll()
-      .where('employee_id', '=', employeeId)
-      .execute();
+    const employeeWages =
+      await this.employeeWagesRepository.findAllForEmployee(employeeId);
 
     const totalEarned = reduceWagesToCurrency(
       employeeWages,
@@ -60,20 +52,9 @@ export class WageService {
 
     const newBalance = withdraw(balance, requestedMoney, Ratio.dollarToPeso());
 
-    await this.db.transaction().execute(async (trx) => {
-      await trx
-        .updateTable('employee_wages')
-        .set('total_earned_wages', newBalance.USD.amount)
-        .where('employee_id', '=', employeeId)
-        .where('currency', '=', 'USD')
-        .execute();
-
-      await trx
-        .updateTable('employee_wages')
-        .set('total_earned_wages', newBalance.ARS.amount)
-        .where('employee_id', '=', employeeId)
-        .where('currency', '=', 'ARS')
-        .execute();
-    });
+    await this.employeeWagesRepository.updateEmployeeBalance(
+      employeeId,
+      newBalance,
+    );
   }
 }
