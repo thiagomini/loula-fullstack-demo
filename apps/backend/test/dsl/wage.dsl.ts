@@ -16,12 +16,22 @@ export function wage(app: INestApplication) {
       options?: { userId?: string },
     ) => {
       const req = request(app.getHttpServer()).get(
-        `/api/wage/balance?currency=${params.currency ?? ''}`,
+        `/api/wages/balance?currency=${params.currency ?? ''}`,
       );
       if (options.userId) {
         req.set('x-user-id', options.userId);
       }
       return req;
+    },
+    requestAccess: (
+      params: { currency: 'USD' | 'ARS' },
+      options?: { userId?: string },
+    ) => {
+      const req = request(app.getHttpServer()).post(`/api/wages/requests`);
+      if (options.userId) {
+        req.set('x-user-id', options.userId);
+      }
+      return req.send(params);
     },
     createEmployeeWage(data: CreateEmployeeWageCommand) {
       const db = app.get<Database>(DATABASE);

@@ -1,11 +1,11 @@
-import { Controller, Get, Headers, Query } from '@nestjs/common';
+import { Body, Controller, Get, Headers, Post, Query } from '@nestjs/common';
 import { USER_HEADER } from '../iam/headers';
 import { ZodValidationPipe } from '../utils/zod-validation.pipe';
 import { WageService } from './application/wage.service';
 import { currencySchema } from './currency.validation';
 import { Currency } from './domain/currency';
 
-@Controller('wage')
+@Controller('wages')
 export class WageController {
   constructor(private readonly wageService: WageService) {}
 
@@ -28,4 +28,11 @@ export class WageController {
       currency: requestedCurrency,
     };
   }
+
+  @Post('requests')
+  public async requestWageAccess(
+    @Body()
+    _request: unknown,
+    @Headers(USER_HEADER) _userId?: string,
+  ) {}
 }
