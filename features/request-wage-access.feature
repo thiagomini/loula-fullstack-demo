@@ -23,11 +23,11 @@ Feature: Request Wage Access
       | amount | currency | amountRequested | currencyRequested | approved |
       | 1      | "USD"    | 1               | "USD"             | true     |
       | 1      | "USD"    | 100             | "ARS"             | true     |
+      | 100    | "ARS"    | 100             | "ARS"             | true     |
+      | 100    | "ARS"    | 1               | "USD"             | true     |
       | 1      | "USD"    | 101             | "ARS"             | false    |
       | 0      | "USD"    | 1               | "USD"             | false    |
       | 0      | "USD"    | 1               | "ARS"             | false    |
-      | 100    | "ARS"    | 100             | "ARS"             | true     |
-      | 100    | "ARS"    | 1               | "USD"             | true     |
       | 100    | "ARS"    | 2               | "USD"             | false    |
       | 0      | "ARS"    | 1               | "ARS"             | false    |
       | 0      | "ARS"    | 1               | "USD"             | false    |
@@ -45,7 +45,6 @@ Feature: Request Wage Access
       | 1         | 1         | 2               | "ARS"             | true     |
       | 0         | 1         | 1               | "ARS"             | true     |
       | 0         | 100       | 1               | "USD"             | true     |
-      | 1         | 1         | 2               | "USD"             | false    |
       | 1         | 1         | 2               | "USD"             | false    |
       | 0         | 0         | 1               | "USD"             | false    |
       | 0         | 0         | 1               | "ARS"             | false    |

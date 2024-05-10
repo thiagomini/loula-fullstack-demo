@@ -156,5 +156,40 @@ describe('Request Wage Access (e2e)', () => {
           .expect(400);
       },
     );
+
+    test.each`
+      amountUSD | amountARS | amountRequested | currencyRequested
+      ${1}      | ${1}      | ${2}            | ${'USD'}
+      ${0}      | ${0}      | ${1}            | ${'USD'}
+      ${0}      | ${0}      | ${1}            | ${'ARS'}
+      ${0}      | ${1}      | ${1}            | ${'USD'}
+      ${1}      | ${1}      | ${200}          | ${'ARS'}
+    `(
+      'user request wage access is denied when it has $amountUSD USD and $amountARS ARS and requests $amountRequested $currencyRequested',
+      async ({ amountUSD, amountARS, amountRequested, currencyRequested }) => {
+        // Arrange
+        const employeeId = randomUUID();
+        await dsl.employee.createEmployee({ id: employeeId });
+        await dsl.wage.createEmployeeWage({
+          employeeId,
+          amount: amountUSD,
+          currency: 'USD',
+        });
+        await dsl.wage.createEmployeeWage({
+          employeeId,
+          amount: amountARS,
+          currency: 'ARS',
+        });
+
+        // Act
+        await dsl.wage
+          .requestAccess(
+            { currency: currencyRequested, amount: amountRequested },
+            { userId: employeeId },
+          )
+          // Assert
+          .expect(400);
+      },
+    );
   });
 });
