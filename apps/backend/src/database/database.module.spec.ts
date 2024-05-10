@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Kysely } from 'kysely';
-import { DB } from 'kysely-codegen';
 import { DATABASE } from './constants';
 import { DatabaseModule } from './database.module';
+import { Database } from './database.type';
 
 describe('Database Module', () => {
   let testingModule: TestingModule;
@@ -23,7 +23,7 @@ describe('Database Module', () => {
   test('Initializes DB connection', async () => {
     // Arrange
     const newModule = await createModule();
-    const db = testingModule.get<Kysely<DB>>(DATABASE);
+    const db = testingModule.get<Database>(DATABASE);
 
     // Act
     await newModule.close();

@@ -1,8 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { DATABASE } from '../../src/database/constants';
-import { Kysely } from 'kysely';
-import { DB } from 'kysely-codegen';
+import { Database } from '../../src/database/database.type';
 
 export type AvailableBalanceParams = { currency: 'USD' | 'ARS' };
 export function wage(app: INestApplication) {
@@ -24,7 +23,7 @@ export function wage(app: INestApplication) {
       amount: number;
       currency: 'USD' | 'ARS';
     }) {
-      const db = app.get<Kysely<DB>>(DATABASE);
+      const db = app.get<Database>(DATABASE);
       return db
         .insertInto('employee_wages')
         .values({

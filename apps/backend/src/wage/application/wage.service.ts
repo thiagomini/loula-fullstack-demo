@@ -1,7 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Kysely } from 'kysely';
-import { DB } from 'kysely-codegen';
 import { DATABASE } from '../../database/constants';
+import { Database } from '../../database/database.type';
 import { reduceWagesToCurrency } from '../domain/convert-currency';
 import { Currency } from '../domain/currency';
 import { Money } from '../domain/money';
@@ -10,7 +9,7 @@ import { Money } from '../domain/money';
 export class WageService {
   constructor(
     @Inject(DATABASE)
-    private readonly db: Kysely<DB>,
+    private readonly db: Database,
   ) {}
 
   public async getEmployeeWagesInCurrency(

@@ -1,8 +1,7 @@
 import { Inject, Module, OnModuleDestroy } from '@nestjs/common';
-import { databaseProvider } from './database.provider';
-import { Kysely } from 'kysely';
-import { DB } from 'kysely-codegen';
 import { DATABASE } from './constants';
+import { databaseProvider } from './database.provider';
+import { Database } from './database.type';
 
 @Module({
   providers: [databaseProvider],
@@ -11,7 +10,7 @@ import { DATABASE } from './constants';
 export class DatabaseModule implements OnModuleDestroy {
   constructor(
     @Inject(DATABASE)
-    private readonly db: Kysely<DB>,
+    private readonly db: Database,
   ) {}
   async onModuleDestroy() {
     return await this.db.destroy();
