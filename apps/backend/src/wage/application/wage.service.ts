@@ -2,9 +2,9 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Kysely } from 'kysely';
 import { DB } from 'kysely-codegen';
 import { DATABASE } from '../../database/constants';
+import { reduceWagesToCurrency } from '../domain/convert-currency';
 import { Currency } from '../domain/currency';
 import { Money } from '../domain/money';
-import { Ratio } from '../domain/ratio';
 
 @Injectable()
 export class WageService {
@@ -19,25 +19,10 @@ export class WageService {
   ): Promise<Money> {
     const employeeWages = await this.db
       .selectFrom('employee_wages')
-      .select(['currency', 'total_earned_wages'])
+      .selectAll()
       .where('employee_id', '=', employeeId)
       .execute();
 
-    return employeeWages.reduce(
-      (total, current) => {
-        const currentMoney = new Money(
-          current.total_earned_wages,
-          current.currency as Currency,
-        );
-        if (currentMoney.isSameCurrencyOf(total)) {
-          return total.plus(currentMoney);
-        } else {
-          return total.plus(
-            currentMoney.to(total.currency, Ratio.dollarToPeso()),
-          );
-        }
-      },
-      new Money(0, requestedCurrency as Currency),
-    );
+    return reduceWagesToCurrency(employeeWages, requestedCurrency);
   }
 }
