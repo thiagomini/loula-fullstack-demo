@@ -27,26 +27,14 @@ describe('Request Wage Access (e2e)', () => {
 
   describe('success cases', () => {
     test.each`
-      amount | currency | amountRequested | currencyRequested | approved
-      ${1}   | ${'USD'} | ${1}            | ${'USD'}          | ${true}
-      ${1}   | ${'USD'} | ${100}          | ${'ARS'}          | ${true}
-      ${1}   | ${'USD'} | ${101}          | ${'ARS'}          | ${false}
-      ${0}   | ${'USD'} | ${1}            | ${'USD'}          | ${false}
-      ${0}   | ${'USD'} | ${1}            | ${'ARS'}          | ${false}
-      ${100} | ${'ARS'} | ${100}          | ${'ARS'}          | ${true}
-      ${100} | ${'ARS'} | ${1}            | ${'USD'}          | ${true}
-      ${100} | ${'ARS'} | ${2}            | ${'USD'}          | ${false}
-      ${0}   | ${'ARS'} | ${1}            | ${'ARS'}          | ${false}
-      ${0}   | ${'ARS'} | ${1}            | ${'USD'}          | ${false}
+      amount | currency | amountRequested | currencyRequested
+      ${1}   | ${'USD'} | ${1}            | ${'USD'}
+      ${1}   | ${'USD'} | ${100}          | ${'ARS'}
+      ${100} | ${'ARS'} | ${100}          | ${'ARS'}
+      ${100} | ${'ARS'} | ${1}            | ${'USD'}
     `(
-      'requested is approved: $approved when user has $amount $currency and requests $amountRequested $currencyRequested',
-      async ({
-        amount,
-        currency,
-        amountRequested,
-        currencyRequested,
-        approved,
-      }) => {
+      'requested is approved when user has $amount $currency and requests $amountRequested $currencyRequested',
+      async ({ amount, currency, amountRequested, currencyRequested }) => {
         // Arrange
         const employeeId = randomUUID();
         await dsl.employee.createEmployee({ id: employeeId });
@@ -63,7 +51,7 @@ describe('Request Wage Access (e2e)', () => {
             { userId: employeeId },
           )
           // Assert
-          .expect(approved ? 201 : 400);
+          .expect(201);
       },
     );
     test.todo('user request wage access when it has both currencies');
@@ -103,5 +91,36 @@ describe('Request Wage Access (e2e)', () => {
         .requestAccess({ currency: 'USD', amount: 0 }, { userId: employeeId })
         .expect(400);
     });
+
+    test.each`
+      amount | currency | amountRequested | currencyRequested
+      ${1}   | ${'USD'} | ${101}          | ${'ARS'}
+      ${0}   | ${'USD'} | ${1}            | ${'USD'}
+      ${0}   | ${'USD'} | ${1}            | ${'ARS'}
+      ${100} | ${'ARS'} | ${2}            | ${'USD'}
+      ${0}   | ${'ARS'} | ${1}            | ${'ARS'}
+      ${0}   | ${'ARS'} | ${1}            | ${'USD'}
+    `(
+      'requested is denied when user has $amount $currency and requests $amountRequested $currencyRequested',
+      async ({ amount, currency, amountRequested, currencyRequested }) => {
+        // Arrange
+        const employeeId = randomUUID();
+        await dsl.employee.createEmployee({ id: employeeId });
+        await dsl.wage.createEmployeeWage({
+          employeeId,
+          amount,
+          currency,
+        });
+
+        // Act
+        await dsl.wage
+          .requestAccess(
+            { currency: currencyRequested, amount: amountRequested },
+            { userId: employeeId },
+          )
+          // Assert
+          .expect(400);
+      },
+    );
   });
 });
