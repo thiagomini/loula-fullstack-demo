@@ -81,5 +81,12 @@ describe('Employee Available Balance (e2e)', () => {
         .availableBalance({ currency: 'USD' }, { userId: undefined })
         .expect(403);
     });
+
+    test('Returns 400 when currency is not provided', async () => {
+      const employeeId = randomUUID();
+      await dsl.wage
+        .availableBalance({ currency: undefined }, { userId: employeeId })
+        .expect(400);
+    });
   });
 });

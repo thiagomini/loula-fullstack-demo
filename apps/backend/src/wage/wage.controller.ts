@@ -6,6 +6,8 @@ import { USER_HEADER } from '../iam/headers';
 import { Money } from './domain/money';
 import { Currency } from './domain/currency';
 import { Ratio } from './domain/ratio';
+import { ZodValidationPipe } from '../utils/zod-validation.pipe';
+import { currencySchema } from './currency.validation';
 
 @Controller('wage')
 export class WageController {
@@ -16,7 +18,8 @@ export class WageController {
 
   @Get('balance')
   public async availableBalance(
-    @Query('currency') requestedCurrency: string,
+    @Query('currency', new ZodValidationPipe(currencySchema))
+    requestedCurrency: string,
     @Headers(USER_HEADER) userId?: string,
   ) {
     const employeeId = userId;

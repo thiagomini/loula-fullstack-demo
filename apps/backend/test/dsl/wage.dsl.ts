@@ -4,6 +4,7 @@ import { DATABASE } from '../../src/database/constants';
 import { Kysely } from 'kysely';
 import { DB } from 'kysely-codegen';
 
+export type AvailableBalanceParams = { currency: 'USD' | 'ARS' };
 export function wage(app: INestApplication) {
   return Object.freeze({
     availableBalance: (
@@ -11,7 +12,7 @@ export function wage(app: INestApplication) {
       options?: { userId?: string },
     ) => {
       const req = request(app.getHttpServer()).get(
-        `/api/wage/balance?currency=${params.currency}`,
+        `/api/wage/balance?currency=${params.currency ?? ''}`,
       );
       if (options.userId) {
         req.set('x-user-id', options.userId);
